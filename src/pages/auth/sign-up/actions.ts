@@ -1,6 +1,9 @@
-import { signUpSchema } from "./schema";
+import { signUpSchema, type SignUpSchema } from "./schema";
 
-export async function handleSignUp(data: FormData) {
+export async function handleSignUp(
+  data: FormData,
+  createAccount: (variables: SignUpSchema) => Promise<void>
+) {
   const result = signUpSchema.safeParse(Object.fromEntries(data))
 
   if (!result.success) {
@@ -14,7 +17,11 @@ export async function handleSignUp(data: FormData) {
   try {
     console.log(email, name)
 
-    //send to api
+    await createAccount({
+      email,
+      name
+    })
+
   } catch (error) {
     console.error(error)
 

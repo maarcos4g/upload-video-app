@@ -1,18 +1,16 @@
 import { useFormState } from "@/hooks/use-form-state";
 import { Input } from "@/components/input";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { handleSignUp } from "./actions";
 import { Loader2 } from "lucide-react";
+import { useCreateAccount } from "@/http/create-account";
 
 export function SignUp() {
 
-  const navigate = useNavigate()
+  const { mutateAsync: createAccount } = useCreateAccount()
 
   const [{ errors, message, success }, handleSubmit, isPending] = useFormState(
-    handleSignUp,
-    () => {
-      navigate('/')
-    }
+    (data) => handleSignUp(data, createAccount)
   )
 
   return (
@@ -85,10 +83,10 @@ export function SignUp() {
 
         <button
           type="submit"
-          className="w-full py-3 bg-emerald-950 rounded-md font-bold text-sm"
+          className="w-full flex justify-center py-3 bg-emerald-950 rounded-md font-bold text-sm"
         >
           {isPending ? (
-            <Loader2 className="size-4 animate-spin" />
+            <Loader2 className="size-4 animate-spin text-center" />
           ) : (
             'Finalizar cadastro'
           )}
@@ -96,7 +94,7 @@ export function SignUp() {
       </form>
 
       {success === false && message && (
-        <p>{message}</p>
+        <p className="text-sm text-red-500">{message}</p>
       )}
 
       <div

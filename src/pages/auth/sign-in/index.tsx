@@ -1,19 +1,18 @@
 import { useFormState } from "@/hooks/use-form-state";
 import { Input } from "@/components/input";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { handleAuthenticate } from "./actions";
 import { Loader2 } from "lucide-react";
+import { useSignIn } from "@/http/sign-in";
 
 export function SignIn() {
 
-  const navigate = useNavigate()
   const [searchParams] = useSearchParams()
 
+  const { mutateAsync: authenticate } = useSignIn()
+
   const [{ errors, message, success }, handleSubmit, isPending] = useFormState(
-    handleAuthenticate,
-    () => {
-      navigate('/')
-    }
+    (data) => handleAuthenticate(data, authenticate),
   )
 
   return (
@@ -65,7 +64,7 @@ export function SignIn() {
 
         <button
           type="submit"
-          className="w-full py-3 bg-emerald-950 rounded-md font-bold text-sm"
+          className="w-full flex justify-center py-3 bg-emerald-950 rounded-md font-bold text-sm"
         >
           {isPending ? (
             <Loader2 className="size-4 animate-spin" />
