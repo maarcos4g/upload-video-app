@@ -3,16 +3,21 @@ import { Home } from "./pages/app/home";
 import { SignIn } from "./pages/auth/sign-in";
 import { AuthLayout } from "./pages/layouts/auth";
 import { SignUp } from "./pages/auth/sign-up";
+import { AppLayout } from "./pages/layouts/app";
 
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <h1>Layout</h1>,
+    element: <AppLayout />,
     children: [
       {
         path: '/',
         element: <Home />
-      }
+      },
+      {
+        path: '/org/:slug',
+        element: <h1>Página da Organização</h1>
+      },
     ]
   },
   {
