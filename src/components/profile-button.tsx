@@ -7,6 +7,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from './ui/dropdown-menu'
+import { useProfile } from '@/http/profile'
+import { Skeleton } from './ui/skeleton'
+import { useSignOut } from '@/http/sign-out'
 
 function getInitials(name: string): string {
   const initials = name
@@ -20,34 +23,43 @@ function getInitials(name: string): string {
 
 export function ProfileButton() {
 
-  const user = {
-    id: crypto.randomUUID(),
-    name: 'Jhon Doe',
-    email: 'jhon@upload.video',
-    avatarURL: 'https://github.com/shadcn.png'
-  }
+  const { data: user, isLoading } = useProfile()
+
+  const { mutateAsync: signOut } = useSignOut()
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="flex items-center gap-3 outline-none">
-        <div className="flex flex-col items-end">
-          <span className="text-sm font-medium">{user.name}</span>
-          <span className="text-xs text-zinc-400">{user.email}</span>
-        </div>
-        <Avatar className="size-8">
-          {user.avatarURL && <AvatarImage src={user.avatarURL} />}
-          {user.name && (
-            <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
-          )}
-        </Avatar>
-        <ChevronDown className="size-4 text-zinc-600" />
+        {!isLoading ? (
+          <>
+            <div className="flex flex-col items-end">
+              <span className="text-sm font-medium">{user?.name}</span>
+              <span className="text-xs text-zinc-400">{user?.email}</span>
+            </div>
+            <Avatar className="size-8">
+              {user?.avatarURL && <AvatarImage src={user?.avatarURL} />}
+              {user?.name && (
+                <AvatarFallback>{getInitials(user?.name)}</AvatarFallback>
+              )}
+            </Avatar>
+            <ChevronDown className="size-4 text-zinc-600" />
+          </>
+        ) : (
+          <>
+            <div className="flex flex-col items-end space-y-1.5">
+              <Skeleton className="h-3 w-24" />
+              <Skeleton className="h-4 w-32" />
+            </div>
+            <Skeleton className="size-8 rounded-full" />
+          </>
+        )}
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-72 bg-zinc-900 border-zinc-800 text-zinc-200">
         <DropdownMenuItem asChild>
-          <a href="">
+          <button onClick={() => signOut()}>
             <LogOut className="mr-2 size-4" />
-            Sign Out
-          </a>
+            Sair
+          </button>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
