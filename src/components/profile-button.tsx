@@ -1,10 +1,13 @@
-import { ChevronDown, LogOut } from 'lucide-react'
+import { ChevronDown, LogOut, User2 } from 'lucide-react'
 
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from './ui/dropdown-menu'
 import { useProfile } from '@/http/profile'
@@ -55,8 +58,23 @@ export function ProfileButton() {
         )}
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-72 bg-zinc-900 border-zinc-800 text-zinc-200">
+
+        <DropdownMenuLabel className="text-sm font-semibold">Perfil do usuário</DropdownMenuLabel>
+        <DropdownMenuSeparator className="bg-zinc-700/50" />
+
+        <DropdownMenuGroup>
+          <DropdownMenuItem asChild>
+            <button className='w-full '>
+              <User2 className='size-4' />
+              <span>Editar Perfil</span>
+            </button>
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+
+        <DropdownMenuSeparator className="my-2 bg-zinc-700/50" />
+
         <DropdownMenuItem asChild>
-          <button onClick={() => signOut()}>
+          <button className='w-full' onClick={() => signOut()}>
             <LogOut className="mr-2 size-4" />
             Sair
           </button>

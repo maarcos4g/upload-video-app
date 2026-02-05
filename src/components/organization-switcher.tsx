@@ -11,12 +11,16 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Link } from "react-router-dom";
 import { useCurrentOrganization } from "@/hooks/use-current-organization";
+import { Dialog, DialogTrigger } from "./ui/dialog";
+import { CreateOrganizationDialog } from "./create-organization-dialog";
+import { useState } from "react";
 
 type Organization = {
   id: string
   name: string
   slug: string
   avatarURL: string | null
+  role: string
 }
 
 type OrganizationSwitcherProps = {
@@ -25,13 +29,15 @@ type OrganizationSwitcherProps = {
 
 export function OrganizationSwitcher({ organizations }: OrganizationSwitcherProps) {
 
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
   const { organization: currentOrganization } = useCurrentOrganization(organizations)
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <div
-          className="bg-zinc-800 border border-zinc-600 rounded-md px-4 py-2 flex items-center justify-between gap-3 w-42"
+          className="bg-zinc-800 border border-zinc-600 rounded-md px-4 py-2 flex items-center justify-between gap-3 min-w-42"
         >
           <span className="font-semibold text-sm text-zinc-100">{currentOrganization.name}</span>
           <ChevronsUpDown className="size-4 text-zinc-500 stroke-2" />
@@ -75,11 +81,16 @@ export function OrganizationSwitcher({ organizations }: OrganizationSwitcherProp
           })}
         </DropdownMenuGroup>
         <DropdownMenuSeparator className="my-2 bg-zinc-700/50" />
-        <DropdownMenuItem asChild>
-          <Link to="" className="hover:bg-zinc-700/50">
-            <PlusCircle className="mr-2 size-4 text-emerald-600" />
-            Criar Organização
-          </Link>
+        <DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger className="w-full">
+              <button className="w-full flex items-center rounded-sm px-2 py-1.5 text-sm outline-hidden select-none focus:bg-accent focus:text-accent-foreground hover:bg-accent hover:text-accent-foreground">
+                <PlusCircle className="mr-2 size-4 text-emerald-600" />
+                Criar Organização
+              </button>
+            </DialogTrigger>
+            <CreateOrganizationDialog onClose={() => setIsDialogOpen(false)} />
+          </Dialog>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
