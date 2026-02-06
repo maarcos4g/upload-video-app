@@ -1,4 +1,5 @@
 import { Header } from "@/components/header";
+import { NavigationBar } from "@/components/navigation-bar";
 import { api } from "@/http/client";
 import { isAxiosError } from "axios";
 import { useLayoutEffect } from "react";
@@ -19,8 +20,8 @@ export function AppLayout() {
           if (status === 401 && code === 'UNAUTHORIZED') {
             navigate(
               '/sign-in', {
-                replace: true
-              }
+              replace: true
+            }
             )
           }
         }
@@ -39,8 +40,9 @@ export function AppLayout() {
       className="w-full flex flex-col min-h-screen bg-zinc-950 text-zinc-100 space-y-4"
     >
       <Header />
+        <NavigationBar />
 
-      <main className="flex-1 flex flex-col max-w-300 mx-auto">
+      <main className="flex-1 flex flex-col w-full mx-auto space-y-4">
         <Outlet />
       </main>
     </main>

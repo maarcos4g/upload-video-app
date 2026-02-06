@@ -4,6 +4,7 @@ import { SignIn } from "./pages/auth/sign-in";
 import { AuthLayout } from "./pages/layouts/auth";
 import { SignUp } from "./pages/auth/sign-up";
 import { AppLayout } from "./pages/layouts/app";
+import { OrganizationDashboard } from "./pages/app/organization-dashboard";
 
 export const router = createBrowserRouter([
   {
@@ -16,7 +17,7 @@ export const router = createBrowserRouter([
       },
       {
         path: '/org/:slug',
-        element: <h1>Página da Organização</h1>
+        element: <OrganizationDashboard />
       },
     ]
   },
