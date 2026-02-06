@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import logo from '@/assets/logo.svg'
 import { OrganizationSwitcher } from './organization-switcher'
 import { Bell, Plus } from 'lucide-react'
@@ -5,10 +6,14 @@ import { Link } from 'react-router-dom'
 import { ProfileButton } from './profile-button'
 import { useGetOrganizations } from '@/http/get-organizations'
 import { Skeleton } from './ui/skeleton'
+import { Dialog, DialogTrigger } from './ui/dialog'
+import { CreateOrganizationDialog } from './create-organization-dialog'
 
 export function Header() {
 
   const { data, isLoading } = useGetOrganizations()
+
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const hasOrganizations = (data?.organizations.length ?? 0) > 0
 
@@ -28,13 +33,17 @@ export function Header() {
             hasOrganizations ? (
               <OrganizationSwitcher organizations={data?.organizations ?? []} />
             ) : (
-              <Link
-                to='/create-organization'
-                className='flex items-center gap-4 bg-emerald-800/50 rounded-4xl px-4 py-2 text-sm font-semibold cursor-pointer'
-              >
-                <Plus className='size-4' />
-                Nova Organização
-              </Link>
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogTrigger className="w-full">
+                  <button
+                    className='flex items-center gap-4 bg-emerald-800/50 rounded-4xl px-4 py-2 text-sm font-semibold cursor-pointer'
+                  >
+                    <Plus className='size-4' />
+                    Nova Organização
+                  </button>
+                </DialogTrigger>
+                <CreateOrganizationDialog onClose={() => setIsDialogOpen(false)} />
+              </Dialog>
             )
           ) : (
             <>
