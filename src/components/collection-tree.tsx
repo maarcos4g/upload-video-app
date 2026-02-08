@@ -32,11 +32,11 @@ function TreeItem({ item, selectedId, onSelect }: { item: Collection } & Omit<Co
 
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-      <CollapsibleTrigger asChild>
+      <CollapsibleTrigger asChild data-selected={isSelected}>
         <button
           onClick={() => onSelect(item.id)}
           className={cn(
-            "flex items-center gap-2 w-full p-1.5 rounded-sm transition-colors text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100",
+            "flex items-center gap-2 w-full p-1.5 rounded-sm transition-colors text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100 data-[selected=true]:bg-zinc-800",
             isOpen && "text-zinc-100"
           )}>
           <ChevronRight className={cn("size-3.5 transition-transform", isOpen && "rotate-90")} />

@@ -1,41 +1,23 @@
 import { CollectionTree } from "@/components/collection-tree";
-import { Plus } from "lucide-react";
+import { Folder, Plus } from "lucide-react";
 import { useState } from "react";
 import { Progress } from "@/components/ui/progress"
 import { UploadsTable } from "@/components/uploads-table";
-
-const collections = [
-  {
-    id: crypto.randomUUID(),
-    name: 'Todos os Uploads',
-    children: [
-      {
-        id: crypto.randomUUID(),
-        name: 'Eventos',
-        children: []
-      },
-      {
-        id: crypto.randomUUID(),
-        name: 'Aulas',
-        children: []
-      },
-      {
-        id: crypto.randomUUID(),
-        name: 'Vídeos do YouTube',
-        children: [
-          {
-            id: crypto.randomUUID(),
-            name: 'Tutoriais',
-            children: []
-          }
-        ]
-      },
-    ]
-  }
-]
+import { useGetCollections } from "@/http/get-collections";
+import { useParams } from "react-router-dom";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import { CreateCollectionDialog } from "@/components/create-collection-dialog";
 
 export function OrganizationDashboard() {
+  const { slug } = useParams<{ slug: string }>()
+
+  const { data, isLoading } = useGetCollections({ slug: slug! })
+
+  const collections = data?.collections ?? []
+
   const [selectedCollectionId, setSelectedCollectionId] = useState<string | null>(null)
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   return (
     <div
@@ -45,23 +27,43 @@ export function OrganizationDashboard() {
         className="px-6 py-4 space-y-2.5"
       >
         <div className="flex items-center justify-between">
-          <h1>Coleções</h1>
+          <h1 className="font-bold text-zinc-50">Coleções</h1>
 
-          <button>
-            <Plus />
-          </button>
+          <Dialog
+            open={isDialogOpen}
+            onOpenChange={setIsDialogOpen}
+          >
+            <DialogTrigger className="cursor-pointer">
+              <button>
+                <Plus className="size-5" />
+              </button>
+            </DialogTrigger>
+            <CreateCollectionDialog collections={collections} onClose={() => setIsDialogOpen(false)} />
+          </Dialog>
         </div>
 
-        <CollectionTree
-          items={collections}
-          selectedId={selectedCollectionId}
-          onSelect={setSelectedCollectionId}
-        />
+        {isLoading ? (
+          <div className="space-y-2">
+            <Skeleton className="h-6 w-full bg-zinc-800" />
+            <Skeleton className="h-6 w-3/4 bg-zinc-800 mx-2" />
+          </div>
+        ) : collections.length > 0 ? (
+          <CollectionTree
+            items={collections}
+            selectedId={selectedCollectionId}
+            onSelect={setSelectedCollectionId}
+          />
+        ) : (
+          <div className="w-full flex flex-col items-center justify-center py-10 text-zinc-600">
+            <Folder className="size-6 mb-2" />
+            <p className="text-xs">Nenhuma coleção criada.</p>
+          </div>
+        )}
       </aside>
 
       <div className="px-4 py-2 flex flex-col space-y-5">
         <div
-        className="flex items-center justify-between"
+          className="flex items-center justify-between"
         >
           <h1 className="text-xl font-bold text-zinc-50">Uploads</h1>
 
@@ -72,7 +74,7 @@ export function OrganizationDashboard() {
               </span>
 
               <span
-              className="text-xs font-medium text-zinc-200"
+                className="text-xs font-medium text-zinc-200"
               >
                 4.5GB
                 <span className="text-zinc-500">/10GB</span>
