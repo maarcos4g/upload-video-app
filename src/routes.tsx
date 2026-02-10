@@ -5,6 +5,8 @@ import { AuthLayout } from "./pages/layouts/auth";
 import { SignUp } from "./pages/auth/sign-up";
 import { AppLayout } from "./pages/layouts/app";
 import { OrganizationDashboard } from "./pages/app/organization-dashboard";
+import { NewUpload } from "./pages/app/new-upload";
+import { BatchUpdates } from "./pages/app/new-upload/batch-updates";
 
 export const router = createBrowserRouter([
   {
@@ -18,6 +20,14 @@ export const router = createBrowserRouter([
       {
         path: '/org/:slug',
         element: <OrganizationDashboard />
+      },
+      {
+        path: '/org/:slug/upload',
+        element: <NewUpload />
+      },
+      {
+        path: '/org/:slug/batch/:batchId',
+        element: <BatchUpdates />
       },
     ]
   },

@@ -34,7 +34,13 @@ function TreeItem({ item, selectedId, onSelect }: { item: Collection } & Omit<Co
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
       <CollapsibleTrigger asChild data-selected={isSelected}>
         <button
-          onClick={() => onSelect(item.id)}
+          onClick={() => {
+            if (isSelected) {
+              onSelect('')
+            } else {
+              onSelect(item.id)
+            }
+          }}
           className={cn(
             "flex items-center gap-2 w-full p-1.5 rounded-sm transition-colors text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100 data-[selected=true]:bg-zinc-800",
             isOpen && "text-zinc-100"

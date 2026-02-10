@@ -13,14 +13,14 @@ export function NavigationBar() {
 
   return (
     <nav
-      className="min-w-full flex items-center px-10 gap-4"
+      className="min-w-full flex items-center px-6 gap-4"
     >
       <NavLink to={baseURL}>
         <ListVideo className="size-4" />
         Uploads
       </NavLink>
 
-      <NavLink to=''>
+      <NavLink to={`${baseURL}/upload`}>
         <FilePlus className="size-4" />
         Novo Upload
       </NavLink>
