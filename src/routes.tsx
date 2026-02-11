@@ -7,6 +7,7 @@ import { AppLayout } from "./pages/layouts/app";
 import { OrganizationDashboard } from "./pages/app/organization-dashboard";
 import { NewUpload } from "./pages/app/new-upload";
 import { BatchUpdates } from "./pages/app/new-upload/batch-updates";
+import { OrganizationSettings } from "./pages/app/organization-settings";
 
 export const router = createBrowserRouter([
   {
@@ -28,6 +29,10 @@ export const router = createBrowserRouter([
       {
         path: '/org/:slug/batch/:batchId',
         element: <BatchUpdates />
+      },
+      {
+        path: '/org/:slug/settings',
+        element: <OrganizationSettings />
       },
     ]
   },

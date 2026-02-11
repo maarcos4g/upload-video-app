@@ -84,7 +84,7 @@ export function NewUpload() {
     localStorage.setItem('files', JSON.stringify(filesToUpload))
 
     navigate({
-      pathname: `/org/${slug}/batch/${crypto.randomUUID()}`
+      pathname: `/${slug}/batch/${crypto.randomUUID()}`
     })
   }
 
