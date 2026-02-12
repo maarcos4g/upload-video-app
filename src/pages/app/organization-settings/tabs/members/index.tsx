@@ -8,6 +8,11 @@ import { useParams } from "react-router-dom";
 import { useGetPendingInvites } from "@/http/get-pending-invites";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGetMemberships } from "@/http/get-memberships";
+import { useCreateInvite } from "@/http/create-invite";
+import { useFormState } from "@/hooks/use-form-state";
+import { handleCreateInvite } from "./actions";
+import { toast } from "sonner";
+import { useState } from "react";
 
 export function MembersTab() {
 
@@ -15,6 +20,18 @@ export function MembersTab() {
 
   const { data, isLoading } = useGetPendingInvites({ slug: slug! })
   const { data: memberships, isLoading: loadingMemberships } = useGetMemberships({ slug: slug! })
+
+  const { mutateAsync: createInvite } = useCreateInvite()
+
+  const [{ errors, message, success }, handleSubmit, isPending] = useFormState(
+    (data) => handleCreateInvite(data, createInvite)
+  )
+
+  if (success === false && message) {
+    toast.error(message)
+  }
+
+  const [role, setRole] = useState('')
 
   return (
     <div
@@ -26,15 +43,21 @@ export function MembersTab() {
         <div className="space-y-3">
           <h1 className="font-semibold text-zinc-50">Convidar membros</h1>
           <p className="text-sm text-zinc-500">Convide novo membros através do endereço de e-mail</p>
-          <button
-            className="border border-zinc-800 rounded flex items-center px-2 py-1 gap-2 text-xs text-zinc-100 cursor-pointer"
-          >
-            <Link className="size-3" />
-            Link de convite
-          </button>
+          <form onSubmit={handleSubmit}>
+            <input type="hidden" name="slug" value={slug} />
+            <input type="hidden" name="email" value={''} />
+            <input type="hidden" name="role" value={''} />
+
+            <button
+              className="border border-zinc-800 rounded flex items-center px-2 py-1 gap-2 text-xs text-zinc-100 cursor-pointer"
+            >
+              <Link className="size-3" />
+              Link de convite
+            </button>
+          </form>
         </div>
 
-        <form className="space-y-3">
+        <form className="space-y-3" onSubmit={handleSubmit}>
           <div className="flex items-center gap-2">
             <div className="flex flex-col gap-2">
               <label
@@ -53,15 +76,22 @@ export function MembersTab() {
               />
             </div>
 
+            <input type="hidden" name="slug" value={slug} />
+
+            <input type="hidden" name="role" value={role} />
+
             <div className="flex flex-col gap-2">
               <label
-                htmlFor="email"
+                htmlFor="role"
                 className="text-sm text-zinc-300"
               >
                 Perfil
               </label>
 
-              <Select>
+              <Select
+                value={role}
+                onValueChange={setRole}
+              >
                 <SelectTrigger className="w-full min-h-10 border-zinc-800">
                   <SelectValue placeholder="Selecione" />
                 </SelectTrigger>
@@ -77,9 +107,21 @@ export function MembersTab() {
             </div>
           </div>
 
+          {errors?.email && (
+            <p className="text-xs font-medium text-red-500 dark:text-red-400">
+              {errors.email[0]}
+            </p>
+          )}
+
+          {errors?.role && (
+            <p className="text-xs font-medium text-red-500 dark:text-red-400">
+              {errors.role[0]}
+            </p>
+          )}
+
           <button
             type="submit"
-            disabled
+            disabled={isPending}
             className="w-full bg-zinc-200 text-zinc-900 py-1.5 rounded text-sm disabled:bg-zinc-700 disabled:text-zinc-100 transition-colors cursor-pointer"
           >
             Enviar Convite
