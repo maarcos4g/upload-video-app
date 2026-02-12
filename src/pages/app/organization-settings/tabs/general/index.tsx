@@ -12,6 +12,9 @@ import { useUploadAvatar } from "@/http/upload-avatar";
 import { useFormState } from "@/hooks/use-form-state";
 import { handleUpdateOrganization } from "./actions";
 import type { UpdateOrganizationSchema } from "./schema";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import { DeleteOrganizationDialog } from "@/components/delete-organization-dialog";
+import { useGetMembership } from "@/http/get-membership";
 
 export function GeneralTab() {
   const { slug } = useParams<{ slug: string }>()
@@ -28,6 +31,8 @@ export function GeneralTab() {
   const [{ errors }, handleSubmit] = useFormState(
     (data) => handleUpdateOrganization(data, updateOrganization),
   )
+
+  const { data: membershipData } = useGetMembership({ slug: slug! })
 
   async function onUploadFile(event: ChangeEvent<HTMLInputElement, HTMLInputElement>) {
     const file = event.target.files?.[0]
@@ -193,25 +198,39 @@ export function GeneralTab() {
       </div>
 
       {/* Delete Organization */}
-      <div>
-        <span className="text-[8px] font-bold text-red-500 uppercase tracking-widest bg-red-900/50 px-2 py-1 rounded-lg border border-red-500">
+      <div
+        data-admin={membershipData?.membership.role === 'admin'}
+        className="group"
+      >
+        <span
+          className="text-[8px] font-bold text-red-500 uppercase tracking-widest bg-red-900/50 px-2 py-1 rounded-lg border border-red-500 group-data-[admin=false]:opacity-50 group-data-[admin=false]:border-zinc-800 group-data-[admin=false]:text-zinc-500 group-data-[admin=false]:bg-transparent"
+        >
           Zona de Perigo
         </span>
 
         <div className="w-full flex items-center justify-between py-4">
           <div className="flex flex-col gap-2">
-            <span className="text-zinc-200 font-semibold">
+            <span className="text-zinc-200 font-semibold group-data-[admin=false]:text-zinc-700">
               Deletar Organização
             </span>
 
-            <p className="text-xs text-zinc-500 font-normal">
+            <p className="text-xs text-zinc-500 font-normal group-data-[admin=false]:text-zinc-700">
               Todos os dados da organização serão permanentemente deletados <br /> (essa ação é irreversível)
             </p>
           </div>
 
-          <button className="bg-red-500 px-3 py-2 rounded text-sm text-zinc-50 hover:bg-red-600 cursor-pointer transition-all">
-            Deletar organização
-          </button>
+          <Dialog>
+            <DialogTrigger asChild>
+              <button
+                disabled={membershipData?.membership.role !== 'admin'}
+                className="bg-red-500 px-3 py-2 rounded text-sm text-zinc-50 hover:bg-red-600 cursor-pointer transition-all disabled:bg-zinc-800 disabled:text-zinc-500 disabled:cursor-not-allowed disabled:hover:bg-zinc-800"
+              >
+                Deletar organização
+              </button>
+            </DialogTrigger>
+            <DeleteOrganizationDialog slug={slug!} />
+          </Dialog>
+
         </div>
       </div>
     </div>
