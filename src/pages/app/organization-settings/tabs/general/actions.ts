@@ -1,8 +1,9 @@
+import type { UpdateOrganizationResponse } from "@/http/update-organization/types";
 import { type UpdateOrganizationSchema, updateOrganizationSchema } from "./schema";
 
 export async function handleUpdateOrganization(
   data: FormData,
-  updateOrganization: (variables: UpdateOrganizationSchema) => Promise<UpdateOrganizationSchema>
+  updateOrganization: (variables: UpdateOrganizationSchema) => Promise<UpdateOrganizationResponse>
 ) {
   const result = updateOrganizationSchema.safeParse(Object.fromEntries(data))
 
@@ -12,11 +13,14 @@ export async function handleUpdateOrganization(
     return { success: false, message: null, errors }
   }
 
-  const { name } = result.data
+  const { name, domain, shouldAttachUsersByDomain, slug } = result.data
 
   try {
     updateOrganization({
       name,
+      domain,
+      shouldAttachUsersByDomain,
+      slug,
     })
   } catch (error) {
     console.error(error)

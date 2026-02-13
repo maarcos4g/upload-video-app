@@ -1,10 +1,17 @@
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table"
 import { Trash2, User2 } from "lucide-react"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import type { GetPendingInvitesResponse } from "@/http/get-pending-invites/types"
+import type { GetMembershipResponse } from "@/http/get-membership/types"
 
-export function PendingInvites({ invitations }: GetPendingInvitesResponse) {
+type PendingInvitesProps = GetPendingInvitesResponse & {
+  membership: GetMembershipResponse
+}
+
+export function PendingInvites({ invitations, membership }: PendingInvitesProps) {
+
+  const isAdmin = membership.membership.role === 'admin'
+
   return (
     <div className='border border-zinc-800 bg-zinc-900 rounded-md py-1'>
       <Table className="bg-zinc-900">
@@ -28,20 +35,11 @@ export function PendingInvites({ invitations }: GetPendingInvitesResponse) {
                 </TableCell>
                 <TableCell>
                   <div className="flex px-2 py-1 justify-end items-center gap-10">
-                    <Select value={invite.role}>
-                      <SelectTrigger className="w-full min-h-10 border-zinc-800 max-w-40 cursor-not-allowed" disabled>
-                        <SelectValue placeholder="Selecione" />
-                      </SelectTrigger>
-                      <SelectContent
-                        className="bg-zinc-900 text-zinc-300 border-zinc-800"
-                      >
-                        <SelectGroup>
-                          <SelectItem className="focus:bg-zinc-800 focus:text-zinc-100" value="member">Membro</SelectItem>
-                          <SelectItem className="focus:bg-zinc-800 focus:text-zinc-100" value="admin">Admin</SelectItem>
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                    <button>
+                    <span className="text-sm text-zinc-500">{invite.role === 'admin' ? 'Administrador' : 'Membro'}</span>
+                    <button
+                      disabled={!isAdmin}
+                      className="disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
+                    >
                       <Trash2 className="size-4 text-red-500 cursor-pointer" />
                     </button>
                   </div>

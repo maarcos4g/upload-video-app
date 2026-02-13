@@ -13,6 +13,7 @@ import { useFormState } from "@/hooks/use-form-state";
 import { handleCreateInvite } from "./actions";
 import { toast } from "sonner";
 import { useState } from "react";
+import { useGetMembership } from "@/http/get-membership";
 
 export function MembersTab() {
 
@@ -20,6 +21,7 @@ export function MembersTab() {
 
   const { data, isLoading } = useGetPendingInvites({ slug: slug! })
   const { data: memberships, isLoading: loadingMemberships } = useGetMemberships({ slug: slug! })
+  const { data: membershipData } = useGetMembership({ slug: slug! })
 
   const { mutateAsync: createInvite } = useCreateInvite()
 
@@ -32,6 +34,7 @@ export function MembersTab() {
   }
 
   const [role, setRole] = useState('')
+  const isAdmin = membershipData?.membership.role === 'admin'
 
   return (
     <div
@@ -49,7 +52,8 @@ export function MembersTab() {
             <input type="hidden" name="role" value={''} />
 
             <button
-              className="border border-zinc-800 rounded flex items-center px-2 py-1 gap-2 text-xs text-zinc-100 cursor-pointer"
+            disabled={!isAdmin}
+              className="border border-zinc-800 rounded flex items-center px-2 py-1 gap-2 text-xs text-zinc-100 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Link className="size-3" />
               Link de convite
@@ -121,8 +125,8 @@ export function MembersTab() {
 
           <button
             type="submit"
-            disabled={isPending}
-            className="w-full bg-zinc-200 text-zinc-900 py-1.5 rounded text-sm disabled:bg-zinc-700 disabled:text-zinc-100 transition-colors cursor-pointer"
+            disabled={!isAdmin || isPending}
+            className="w-full bg-zinc-200 text-zinc-900 py-1.5 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
           >
             Enviar Convite
           </button>
@@ -144,7 +148,7 @@ export function MembersTab() {
               ))}
             </div>
           ) : (
-            <OrganizationMembers memberships={memberships?.memberships ? memberships.memberships : []} />
+            <OrganizationMembers memberships={memberships?.memberships ? memberships.memberships : []} membership={membershipData!} />
           )}
         </TabsPanel>
         <TabsPanel value="tab-2">
@@ -155,7 +159,7 @@ export function MembersTab() {
               ))}
             </div>
           ) : (
-            <PendingInvites invitations={data?.invitations ? data?.invitations : []} />
+            <PendingInvites invitations={data?.invitations ? data?.invitations : []} membership={membershipData!} />
           )}
         </TabsPanel>
       </Tabs>

@@ -1,20 +1,21 @@
 import { useState, type ChangeEvent } from "react";
+import { useParams } from "react-router-dom";
+
 import { Input } from "@/components/input";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import { DeleteOrganizationDialog } from "@/components/delete-organization-dialog";
+
 import { Building, ClipboardCopy } from "lucide-react";
 import { toast } from "sonner";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useGetOrganization } from "@/http/get-organization";
-
-import { useParams } from "react-router-dom";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useUploadAvatar } from "@/http/upload-avatar";
+import { useGetMembership } from "@/http/get-membership";
+import { useUpdateOrganization } from "@/http/update-organization";
 import { useFormState } from "@/hooks/use-form-state";
 import { handleUpdateOrganization } from "./actions";
-import type { UpdateOrganizationSchema } from "./schema";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import { DeleteOrganizationDialog } from "@/components/delete-organization-dialog";
-import { useGetMembership } from "@/http/get-membership";
 
 export function GeneralTab() {
   const { slug } = useParams<{ slug: string }>()
@@ -23,16 +24,15 @@ export function GeneralTab() {
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
   const { mutateAsync: uploadAvatar } = useUploadAvatar()
 
-  async function updateOrganization(data: UpdateOrganizationSchema) {
-    console.log(data)
-    return data
-  }
+  const { mutateAsync: updateOrganization } = useUpdateOrganization()
 
   const [{ errors }, handleSubmit] = useFormState(
     (data) => handleUpdateOrganization(data, updateOrganization),
   )
 
   const { data: membershipData } = useGetMembership({ slug: slug! })
+
+  const isAdmin = membershipData?.membership.role === 'admin'
 
   async function onUploadFile(event: ChangeEvent<HTMLInputElement, HTMLInputElement>) {
     const file = event.target.files?.[0]
@@ -113,6 +113,8 @@ export function GeneralTab() {
               className="ring-offset-emerald-950 focus-visible:ring-emerald-950 text-sm"
             />
 
+            <input type="text" id="slug" name="slug" value={slug} className="hidden" />
+
             {errors?.name && (
               <p className="text-[10px] font-medium text-red-500 dark:text-red-400">
                 {errors.name[0]}
@@ -121,7 +123,47 @@ export function GeneralTab() {
           </div>
           <button
             type="submit"
-            className="flex items-center text-xs text-zinc-100 cursor-pointer border border-zinc-800 px-2 py-2 rounded"
+            disabled={!isAdmin}
+            className="flex items-center text-xs text-zinc-100 cursor-pointer border border-zinc-800 px-2 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Salvar
+          </button>
+        </form>
+      </div>
+
+      {/* Organization Domain */}
+      <div className="w-full flex items-center justify-between py-4 border-b border-zinc-800">
+        <div className="flex flex-col gap-2">
+          <span className="text-zinc-200 font-semibold">
+            Domínio da organização
+          </span>
+
+          <p className="text-xs text-zinc-500 font-normal">O domínio permite convidar automaticamente todos os novos <br />
+            usuário que tenham o e-mail com esse domínio para a organização.</p>
+        </div>
+
+        <form className="flex items-center gap-2" onSubmit={handleSubmit}>
+          <div>
+            <Input
+              type="text"
+              id="domain"
+              name="domain"
+              defaultValue={data?.organization.domain}
+              className="ring-offset-emerald-950 focus-visible:ring-emerald-950 text-sm"
+            />
+
+            <input type="text" id="slug" name="slug" value={slug} className="hidden" />
+
+            {errors?.domain && (
+              <p className="text-[10px] font-medium text-red-500 dark:text-red-400">
+                {errors.domain[0]}
+              </p>
+            )}
+          </div>
+          <button
+            type="submit"
+            disabled={!isAdmin}
+            className="flex items-center text-xs text-zinc-100 cursor-pointer border border-zinc-800 px-2 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Salvar
           </button>
@@ -153,7 +195,9 @@ export function GeneralTab() {
       </div>
 
       {/* Organization Avatar */}
-      <div className="w-full flex items-center justify-between py-4 border-b border-zinc-800">
+      <div
+        data-admin={isAdmin}
+        className="group w-full flex items-center justify-between py-4 border-b border-zinc-800">
         <div className="flex flex-col gap-2">
           <span className="text-zinc-200 font-semibold">
             Logo da Organização
@@ -172,11 +216,13 @@ export function GeneralTab() {
             </Avatar>
           </div>
 
-          <label htmlFor="avatar" className="cursor-pointer border border-zinc-800 px-3 py-2 rounded-md text-xs font-medium text-zinc-200 transition-colors">
+          <label htmlFor="avatar"
+            className="cursor-pointer border border-zinc-800 px-3 py-2 rounded-md text-xs font-medium text-zinc-200 transition-colors group-data-[admin=false]:cursor-not-allowed group-data-[admin=false]:opacity-50 group-data-[admin=false]:pointer-events-none"
+          >
             Selecionar imagem
           </label>
 
-          <input type="file" name="avatar" id="avatar" className="hidden" accept="image/*" onChange={onUploadFile} />
+          <input type="file" name="avatar" id="avatar" className="hidden" accept="image/*" onChange={onUploadFile} disabled={!isAdmin} />
         </div>
       </div>
 
@@ -199,7 +245,7 @@ export function GeneralTab() {
 
       {/* Delete Organization */}
       <div
-        data-admin={membershipData?.membership.role === 'admin'}
+        data-admin={isAdmin}
         className="group"
       >
         <span
@@ -222,7 +268,7 @@ export function GeneralTab() {
           <Dialog>
             <DialogTrigger asChild>
               <button
-                disabled={membershipData?.membership.role !== 'admin'}
+                disabled={!isAdmin}
                 className="bg-red-500 px-3 py-2 rounded text-sm text-zinc-50 hover:bg-red-600 cursor-pointer transition-all disabled:bg-zinc-800 disabled:text-zinc-500 disabled:cursor-not-allowed disabled:hover:bg-zinc-800"
               >
                 Deletar organização

@@ -3,8 +3,14 @@ import { Trash2 } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import type { GetMembershipsResponse } from "@/http/get-memberships/types"
 import { useProfile } from "@/http/profile"
+import type { GetMembershipResponse } from "@/http/get-membership/types"
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
-export function OrganizationMembers({ memberships }: GetMembershipsResponse) {
+type OrganizationMembersProps = GetMembershipsResponse & {
+  membership: GetMembershipResponse
+}
+
+export function OrganizationMembers({ memberships, membership: userMembership }: OrganizationMembersProps) {
 
   const { data: profile } = useProfile()
 
@@ -13,6 +19,8 @@ export function OrganizationMembers({ memberships }: GetMembershipsResponse) {
     if (b.user.id === profile?.id) return 1
     return 0
   })
+
+  const isAdmin = userMembership.membership.role === 'admin'
 
   return (
     <div className='border border-zinc-800 bg-zinc-900 rounded-md py-1'>
@@ -37,8 +45,24 @@ export function OrganizationMembers({ memberships }: GetMembershipsResponse) {
                 </TableCell>
                 <TableCell>
                   <div className="flex px-3 py-2 justify-end items-center gap-10">
-                    <span className="text-sm text-zinc-500">{membership.role === 'admin' ? 'Administrador' : 'Membro'}</span>
-                    <button>
+                    <Select value={membership.role}>
+                      <SelectTrigger className="w-full min-h-10 border-zinc-800 max-w-40 disabled:cursor-not-allowed" disabled={!isAdmin}>
+                        <SelectValue placeholder="Selecione" />
+                      </SelectTrigger>
+                      <SelectContent
+                        className="bg-zinc-900 text-zinc-300 border-zinc-800"
+                      >
+                        <SelectGroup>
+                          <SelectItem className="focus:bg-zinc-800 focus:text-zinc-100" value="member">Membro</SelectItem>
+                          <SelectItem className="focus:bg-zinc-800 focus:text-zinc-100" value="admin">Admin</SelectItem>
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                    <button
+                      disabled={!isAdmin}
+                      className="disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
+                      onClick={() => console.log(membership.id)}
+                    >
                       <Trash2 className="size-4 text-red-500 cursor-pointer" />
                     </button>
                   </div>
