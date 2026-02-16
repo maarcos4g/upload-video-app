@@ -4,11 +4,11 @@ export type GetCollectionsRequest = {
 
 export type Collection = {
   id: string,
-    name: string,
-    parentId: string | null,
-    createdAt: string,
-    ownerId: string,
-    children: Collection[]
+  name: string,
+  parentId: string | null,
+  createdAt: string,
+  ownerId: string,
+  children: Collection[]
 }
 
 export type GetCollectionsResponse = {
