@@ -1,4 +1,6 @@
 import { FilesTable, type UploadFile } from '@/components/files-table'
+import { useCreateUploadBatch } from '@/http/create-upload-batch'
+import { useUploadStore } from '@/store/use-upload-store'
 import { formatStorageSize } from '@/utils/format-storage-size'
 import { getVideoMetadata } from '@/utils/get-video-metadata'
 import { Upload, Wand2 } from 'lucide-react'
@@ -12,20 +14,49 @@ export function NewUpload() {
   const { slug } = useParams<{ slug: string }>()
 
   const [files, setFiles] = useState<UploadFile[]>([])
+  const [_, setLoadingFiles] = useState(false)
+  const [filesProcessingProgress, setFilesProcessingProgress] = useState<Record<string, number>>({})
+
+  const { mutateAsync: createUploadBatch } = useCreateUploadBatch()
+
+  const { setBatch } = useUploadStore()
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
-    const newFiles = await Promise.all(
-      acceptedFiles.map(async (file) => {
+    setLoadingFiles(true)
+
+    for (const file of acceptedFiles) {
+      setFilesProcessingProgress(prev => ({ ...prev, [file.name]: 0 }))
+
+      try {
         const { preview, duration } = await getVideoMetadata(file)
-        return {
+
+        const processedFile: UploadFile = {
           file,
           preview,
           duration,
-          title: file.name,
+          title: file.name
         }
-      })
-    )
-    setFiles((prev) => [...prev, ...newFiles])
+
+        setFiles((prev) => [...prev, processedFile])
+        setFilesProcessingProgress(prev => ({ ...prev, [file.name]: 100 }))
+      } catch (error) {
+        console.error(`Erro ao processar ${file.name}`, error)
+        toast.error(`Erro ao carregar metadados de ${file.name}`)
+      }
+    }
+    setLoadingFiles(false)
+
+    // const newFiles = await Promise.all(
+    //   acceptedFiles.map(async (file) => {
+    //     const { preview, duration } = await getVideoMetadata(file)
+    //     return {
+    //       file,
+    //       preview,
+    //       duration,
+    //       title: file.name,
+    //     }
+    //   })
+    // )
   }, [])
 
   const {
@@ -35,11 +66,11 @@ export function NewUpload() {
     onDrop,
     accept: {
       'video/mp4': ['.mp4']
-    }
+    },
+    maxFiles: 10
   })
 
   function handleClearFiles() {
-    console.log('Limpou')
     setFiles([])
   }
 
@@ -64,28 +95,30 @@ export function NewUpload() {
     })
   }
 
-  function handleCreateAll() {
+  async function handleCreateAll() {
     if (files.length === 0) {
       toast.error('Selecione os arquivos primeiro!')
     }
 
-    const filesToUpload = files.map((file) => ({
-      id: crypto.randomUUID(),
-      name: file.file.name,
-      size: file.file.size,
-      type: file.file.type,
-      title: file.title,
-      previewURL: file.preview,
-      duration: file.duration,
-      collectionId: null
-    }))
+    const currentCollectionId = '3fa640ab-f776-453e-ace3-f1111b92dfe7'
 
-    localStorage.removeItem('files')
-    localStorage.setItem('files', JSON.stringify(filesToUpload))
+    try {
+      const result = await createUploadBatch({
+        collectionId: currentCollectionId,
+        slug: slug!,
+        titles: files.map(f => f.title.split('.mp4')[0])
+      })
 
-    navigate({
-      pathname: `/${slug}/batch/${crypto.randomUUID()}`
-    })
+      setBatch(result.batchId, result.files, files)
+
+      toast.success('Lote criado com sucesso! Iniciando uploads...')
+      navigate({
+        pathname: `/org/${slug}/batch/${result.batchId}`
+      })
+    } catch (error) {
+      toast.error('Erro ao criar lote de vídeos')
+    }
+
   }
 
   const totalSizeBytes = files.reduce((acc, item) => acc + item.file.size, 0)
@@ -137,12 +170,12 @@ export function NewUpload() {
           Solte os arquivos aqui
         </p>
 
-        <p className='text-xs text-zinc-500'>
-          Aceito apenas arquivos MP4
+        <p className='text-xs text-zinc-500 text-center'>
+          Apenas arquivos MP4. <br /> Limite de 10 por vez.
         </p>
       </div>
 
-      <FilesTable files={files} handleDeleteFile={handleDeleteFile} />
+      <FilesTable files={files} handleDeleteFile={handleDeleteFile} processingProgress={filesProcessingProgress} />
 
       {files.length > 0 && (
         <p className='flex text-sm text-zinc-600 font-semibold gap-1'>

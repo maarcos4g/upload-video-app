@@ -1,5 +1,3 @@
-import dayjs from "dayjs";
-
 export async function getVideoMetadata(file: File): Promise<{ preview: string; duration: string }> {
     return new Promise((resolve, reject) => {
       const video = document.createElement('video');
@@ -9,8 +7,6 @@ export async function getVideoMetadata(file: File): Promise<{ preview: string; d
 
       video.onloadedmetadata = () => {
         const seconds = Math.floor(video.duration);
-
-        const durationFormatted = dayjs().startOf('day').second(seconds).format(seconds >= 3600 ? 'HH:mm:ss' : 'mm:ss');
 
         video.currentTime = 10; 
 
@@ -24,7 +20,7 @@ export async function getVideoMetadata(file: File): Promise<{ preview: string; d
             const preview = canvas.toDataURL('image/jpeg');
             URL.revokeObjectURL(video.src);
 
-            resolve({ preview, duration: durationFormatted });
+            resolve({ preview, duration: String(seconds) });
           }
         };
       };
