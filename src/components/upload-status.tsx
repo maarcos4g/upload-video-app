@@ -5,16 +5,20 @@ interface UploadStatusProps {
 export function UploadStatus({ status }: UploadStatusProps) {
 
   const statusLabel = {
-    ready: "VÁLIDO",
+    completed: "VÁLIDO",
     processing: "PROCESSANDO",
-    expired: "EXPIRADO",
+    uploading: "PROCESSANDO",
+    cancelled: "ERRO",
+    pending: "PENDENTE",
   }
 
   
   const statusStyles = {
-    ready: "bg-emerald-400/10 text-emerald-400 border-emerald-400/20",
+    completed: "bg-emerald-400/10 text-emerald-400 border-emerald-400/20",
     processing: "bg-amber-400/10 text-amber-400 border-amber-400/20",
-    expired: "bg-red-400/10 text-red-400 border-red-400/20",
+    uploading: "bg-amber-400/10 text-amber-400 border-amber-400/20",
+    pending: "bg-amber-400/10 text-amber-400 border-amber-400/20",
+    cancelled: "bg-red-400/10 text-red-400 border-red-400/20",
   }
 
   return (

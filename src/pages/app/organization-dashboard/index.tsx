@@ -1,13 +1,14 @@
 import { CollectionTree } from "@/components/collection-tree";
 import { Folder, Plus } from "lucide-react";
 import { useState } from "react";
-import { Progress } from "@/components/ui/progress"
+import { Progress } from "@/components/ui/progress";
 import { UploadsTable } from "@/components/uploads-table";
 import { useGetCollections } from "@/http/get-collections";
 import { useParams } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { CreateCollectionDialog } from "@/components/create-collection-dialog";
+import { useGetOrganizationUploads } from "@/http/get-uploads";
 
 export function OrganizationDashboard() {
   const { slug } = useParams<{ slug: string }>()
@@ -18,6 +19,11 @@ export function OrganizationDashboard() {
 
   const [selectedCollectionId, setSelectedCollectionId] = useState<string | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const { data: organizationUploads, isLoading: loadingOrganizationUploads } = useGetOrganizationUploads({
+    slug: slug!,
+    collectionId: selectedCollectionId ? selectedCollectionId : undefined
+  })
 
   return (
     <div
@@ -85,7 +91,23 @@ export function OrganizationDashboard() {
           </div>
         </div>
 
-        <UploadsTable />
+        {loadingOrganizationUploads ? (
+          <div className="space-y-2">
+            {Array.from({ length: 6 }).map(() => (
+              <Skeleton className="w-full h-10" />
+            ))}
+          </div>
+        ) :
+          organizationUploads && organizationUploads.uploads.length > 0 ? (
+            <UploadsTable uploads={organizationUploads.uploads} slug={slug!} />
+          ) : (
+            <div className="w-full flex flex-col flex-1 items-center justify-center">
+              <Folder className="size-8 text-zinc-700 mb-4" />
+              <h1 className="text-zinc-500 font-medium">
+                Nenhum upload encontrado nesta coleção ou organização
+              </h1>
+            </div>
+          )}
       </div>
     </div>
   )
