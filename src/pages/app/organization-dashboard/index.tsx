@@ -22,10 +22,21 @@ export function OrganizationDashboard() {
 
   const { set: setCurrentCollectionId, get: getCurrentCollectionId } = useCurrentCollection()
 
+  const [selectedCollectionId, setSelectedCollectionId] = useState<string | null>(
+    getCurrentCollectionId()
+  )
+
   const { data: organizationUploads, isLoading: loadingOrganizationUploads } = useGetOrganizationUploads({
     slug: slug!,
-    collectionId: getCurrentCollectionId() ?? undefined
+    collectionId: selectedCollectionId ?? undefined
   })
+
+  function handleSelectCollection(id: string | null) {
+    const normalizedId = (id === '' || id === 'null') ? null : id
+
+    setCurrentCollectionId(normalizedId as string)
+    setSelectedCollectionId(normalizedId)
+  }
 
   return (
     <div
@@ -58,8 +69,8 @@ export function OrganizationDashboard() {
         ) : collections.length > 0 ? (
           <CollectionTree
             items={collections}
-            selectedId={getCurrentCollectionId()}
-            onSelect={(collectionId) => setCurrentCollectionId(collectionId)}
+            selectedId={selectedCollectionId}
+            onSelect={handleSelectCollection}
           />
         ) : (
           <div className="w-full flex flex-col items-center justify-center py-10 text-zinc-600">

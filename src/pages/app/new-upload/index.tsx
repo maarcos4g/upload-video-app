@@ -1,4 +1,5 @@
 import { FilesTable, type UploadFile } from '@/components/files-table'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { useCurrentCollection } from '@/hooks/use-current-collection'
 import { useCurrentOrganization } from '@/hooks/use-current-organization'
 import { useCreateUploadBatch } from '@/http/create-upload-batch'
@@ -10,11 +11,13 @@ import { useCallback, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
+import { SelectCollectionDialog } from './select-collection-dialog'
 
 export function NewUpload() {
   const navigate = useNavigate()
   const { slug } = useCurrentOrganization()
   const { get: currentCollectionId } = useCurrentCollection()
+  const [isSelectCollectionModalOpen, setIsSelectCollectionModalOpen] = useState(false)
 
   const [files, setFiles] = useState<UploadFile[]>([])
   const [_, setLoadingFiles] = useState(false)
@@ -48,18 +51,6 @@ export function NewUpload() {
       }
     }
     setLoadingFiles(false)
-
-    // const newFiles = await Promise.all(
-    //   acceptedFiles.map(async (file) => {
-    //     const { preview, duration } = await getVideoMetadata(file)
-    //     return {
-    //       file,
-    //       preview,
-    //       duration,
-    //       title: file.name,
-    //     }
-    //   })
-    // )
   }, [])
 
   const {
@@ -103,7 +94,13 @@ export function NewUpload() {
       toast.error('Selecione os arquivos primeiro!')
     }
 
+    if (currentCollectionId() === null) {
+      setIsSelectCollectionModalOpen(true)
+      return;
+    }
+
     try {
+      setIsSelectCollectionModalOpen(false)
       const result = await createUploadBatch({
         collectionId: currentCollectionId() ?? 'null',
         slug: slug!,
@@ -148,22 +145,28 @@ export function NewUpload() {
           >
             Limpar fila
           </span>
-          <button
-            onClick={handleCreateAll}
-            className="flex gap-2 bg-emerald-950 px-4 py-2 rounded text-sm font-semibold hover:bg-emerald-950/80 cursor-pointer disabled:bg-emerald-900/30 disabled:text-zinc-100/30"
-            disabled={files.length <= 0 || isPending}
-          >
-            {!isPending ? (
-              <>
-                Criar todos ({files.length})
-              </>
-            ) : (
-              <>
-                <Loader2 className='animate-spin size-4' />
-                <p>Criando...</p>
-              </>
-            )}
-          </button>
+          <Dialog open={isSelectCollectionModalOpen} onOpenChange={setIsSelectCollectionModalOpen}>
+            <button
+              onClick={handleCreateAll}
+              className="flex gap-2 bg-emerald-950 px-4 py-2 rounded text-sm font-semibold hover:bg-emerald-950/80 cursor-pointer disabled:bg-emerald-900/30 disabled:text-zinc-100/30"
+              disabled={files.length <= 0 || isPending}
+            >
+              {!isPending ? (
+                <>
+                  Criar todos ({files.length})
+                </>
+              ) : (
+                <>
+                  <Loader2 className='animate-spin size-4' />
+                  <p>Criando...</p>
+                </>
+              )}
+            </button>
+
+            <DialogContent className='bg-zinc-900 text-accent border-zinc-700 px-4 py-6'>
+              <SelectCollectionDialog onConfirm={handleCreateAll} />
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 

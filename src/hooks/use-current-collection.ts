@@ -6,8 +6,14 @@ type UseCurrentCollectionResult = {
 export function useCurrentCollection(): UseCurrentCollectionResult {
   const COLLECTION_KEY = 'collectionId'
 
-  const set = (collectionId: string) => {
-    sessionStorage.setItem(COLLECTION_KEY, collectionId)
+  const set = (collectionId: string | null) => {
+    const isInvalid = collectionId === 'null' || collectionId === null || collectionId === ''
+    
+    if (isInvalid) {
+      sessionStorage.removeItem(COLLECTION_KEY)
+    } else {
+      sessionStorage.setItem(COLLECTION_KEY, collectionId)
+    }
   }
 
   const get = () => {
