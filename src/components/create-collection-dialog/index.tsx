@@ -17,7 +17,7 @@ import { useFormState } from "@/hooks/use-form-state";
 import { handleCreateCollection } from "./actions";
 import { toast } from "sonner";
 import { useCreateCollection } from "@/http/create-collection";
-import { useParams } from "react-router-dom";
+import { useCurrentOrganization } from "@/hooks/use-current-organization";
 
 interface CreateOrganizationDialogProps {
   collections: Collection[]
@@ -25,7 +25,7 @@ interface CreateOrganizationDialogProps {
 }
 
 export function CreateCollectionDialog({ collections, onClose }: CreateOrganizationDialogProps) {
-  const { slug } = useParams<{ slug: string }>()
+  const { slug } = useCurrentOrganization()
   const flatCollections = flattenCollections(collections)
 
   const [selectedParentId, setSelectedParentId] = useState<string>('')

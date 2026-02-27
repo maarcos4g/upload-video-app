@@ -6,7 +6,7 @@ import { useState } from "react";
 import { useDeleteCollection } from "@/http/delete-collection";
 import { handleDeleteCollection } from "./actions";
 import { useFormState } from "@/hooks/use-form-state";
-import { useParams } from "react-router-dom";
+import { useCurrentOrganization } from "@/hooks/use-current-organization";
 
 type DeleteCollectionDialogProps = {
   collection: Collection
@@ -14,7 +14,7 @@ type DeleteCollectionDialogProps = {
 
 export function DeleteCollectionDialog({ collection }: DeleteCollectionDialogProps) {
 
-  const { slug } = useParams<{ slug: string }>()
+  const { slug } = useCurrentOrganization()
 
   const [verify, setVerify] = useState('')
 

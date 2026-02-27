@@ -64,7 +64,7 @@ export function FilesTable({ files, handleDeleteFile, processingProgress }: File
                     </div>
                   </TableCell>
                   <TableCell>
-                    <UploadStatus status='ready' />
+                    <UploadStatus status='completed' />
                   </TableCell>
                   <TableCell>
                     <Progress className="w-28" value={progress} />

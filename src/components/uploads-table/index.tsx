@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/table"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 import { UploadStatus } from "../upload-status"
-import { MoreHorizontal } from "lucide-react"
+import { MoreHorizontal, Trash } from "lucide-react"
 
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
@@ -91,7 +91,7 @@ export function UploadsTable({ uploads, slug }: UploadsTableProps) {
 
               <TableCell>
                 <button className="p-2 cursor-pointer hover:bg-zinc-800 rounded-md transition-colors text-zinc-500 hover:text-zinc-100">
-                  <MoreHorizontal className="size-4" />
+                  <Trash className="size-4 text-red-600" />
                 </button>
               </TableCell>
             </TableRow>

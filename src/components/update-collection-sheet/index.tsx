@@ -5,12 +5,12 @@ import { SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetClose } f
 import type { Collection } from "@/http/get-collections/types";
 import { useState } from "react";
 import { useGetCollections } from "@/http/get-collections";
-import { useParams } from "react-router-dom";
 import { Skeleton } from "../ui/skeleton";
 import { flattenCollections } from "@/utils/flatten-collections";
 import { useUpdateCollection } from "@/http/update-collection";
 import { useFormState } from "@/hooks/use-form-state";
 import { handleUpdateCollection } from "./actions";
+import { useCurrentOrganization } from "@/hooks/use-current-organization";
 
 type UpdateCollectionSheetProps = {
   collection: Collection
@@ -19,7 +19,7 @@ type UpdateCollectionSheetProps = {
 export function UpdateCollectionSheet({ collection: currentCollection }: UpdateCollectionSheetProps) {
   const [selectedParentId, setSelectedParentId] = useState<string>(currentCollection.parentId ?? 'none')
 
-  const { slug } = useParams<{ slug: string }>()
+  const { slug } = useCurrentOrganization()
 
   const { data, isLoading } = useGetCollections({ slug: slug! })
 

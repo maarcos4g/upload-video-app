@@ -1,5 +1,4 @@
 import { useState, type ChangeEvent } from "react";
-import { useParams } from "react-router-dom";
 
 import { Input } from "@/components/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -16,9 +15,10 @@ import { useGetMembership } from "@/http/get-membership";
 import { useUpdateOrganization } from "@/http/update-organization";
 import { useFormState } from "@/hooks/use-form-state";
 import { handleUpdateOrganization } from "./actions";
+import { useCurrentOrganization } from "@/hooks/use-current-organization";
 
 export function GeneralTab() {
-  const { slug } = useParams<{ slug: string }>()
+  const { slug } = useCurrentOrganization()
   const { data, isLoading } = useGetOrganization({ slug: slug! })
 
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null)

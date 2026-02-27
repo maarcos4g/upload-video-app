@@ -1,23 +1,26 @@
 import { FilesTable, type UploadFile } from '@/components/files-table'
+import { useCurrentCollection } from '@/hooks/use-current-collection'
+import { useCurrentOrganization } from '@/hooks/use-current-organization'
 import { useCreateUploadBatch } from '@/http/create-upload-batch'
 import { useUploadStore } from '@/store/use-upload-store'
 import { formatStorageSize } from '@/utils/format-storage-size'
 import { getVideoMetadata } from '@/utils/get-video-metadata'
-import { Upload, Wand2 } from 'lucide-react'
+import { Loader2, Upload, Wand2 } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 
 export function NewUpload() {
   const navigate = useNavigate()
-  const { slug } = useParams<{ slug: string }>()
+  const { slug } = useCurrentOrganization()
+  const { get: currentCollectionId } = useCurrentCollection()
 
   const [files, setFiles] = useState<UploadFile[]>([])
   const [_, setLoadingFiles] = useState(false)
   const [filesProcessingProgress, setFilesProcessingProgress] = useState<Record<string, number>>({})
 
-  const { mutateAsync: createUploadBatch } = useCreateUploadBatch()
+  const { mutateAsync: createUploadBatch, isPending } = useCreateUploadBatch()
 
   const { setBatch } = useUploadStore()
 
@@ -86,11 +89,11 @@ export function NewUpload() {
     });
   }
 
-  function generateTitlesWithAI() {
+  function shortTitles() {
     setFiles((prev) => {
       return prev.map((item, index) => ({
         ...item,
-        title: `Aula ${index + 1}`
+        title: `Video ${index + 1}`
       }))
     })
   }
@@ -100,11 +103,9 @@ export function NewUpload() {
       toast.error('Selecione os arquivos primeiro!')
     }
 
-    const currentCollectionId = '3fa640ab-f776-453e-ace3-f1111b92dfe7'
-
     try {
       const result = await createUploadBatch({
-        collectionId: currentCollectionId,
+        collectionId: currentCollectionId() ?? 'null',
         slug: slug!,
         titles: files.map(f => f.title.split('.mp4')[0])
       })
@@ -132,12 +133,12 @@ export function NewUpload() {
 
         <div className="flex gap-3 items-center bg-blend-exclusion">
           <button
-            onClick={generateTitlesWithAI}
+            onClick={shortTitles}
             className='bg-transparent border border-zinc-800 px-4 py-2 rounded cursor-pointer text-xs font-medium text-zinc-300 flex items-center gap-1.5 hover:bg-zinc-900 disabled:text-zinc-500 disabled:hover:bg-transparent disabled:cursor-not-allowed'
             disabled={files.length <= 0}
           >
             <Wand2 className='size-4' />
-            Gerar títulos com IA
+            Encurtar títulos
           </button>
           <div className="w-px h-6 bg-zinc-600" />
           <span
@@ -149,10 +150,19 @@ export function NewUpload() {
           </span>
           <button
             onClick={handleCreateAll}
-            className="bg-emerald-950 px-4 py-2 rounded text-sm font-semibold hover:bg-emerald-950/80 cursor-pointer disabled:bg-emerald-900/30 disabled:text-zinc-100/30"
-            disabled={files.length <= 0}
+            className="flex gap-2 bg-emerald-950 px-4 py-2 rounded text-sm font-semibold hover:bg-emerald-950/80 cursor-pointer disabled:bg-emerald-900/30 disabled:text-zinc-100/30"
+            disabled={files.length <= 0 || isPending}
           >
-            Criar todos ({files.length})
+            {!isPending ? (
+              <>
+                Criar todos ({files.length})
+              </>
+            ) : (
+              <>
+                <Loader2 className='animate-spin size-4' />
+                <p>Criando...</p>
+              </>
+            )}
           </button>
         </div>
       </div>

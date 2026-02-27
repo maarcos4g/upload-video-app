@@ -4,25 +4,27 @@ import { useState } from "react";
 import { Progress } from "@/components/ui/progress";
 import { UploadsTable } from "@/components/uploads-table";
 import { useGetCollections } from "@/http/get-collections";
-import { useParams } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { CreateCollectionDialog } from "@/components/create-collection-dialog";
 import { useGetOrganizationUploads } from "@/http/get-uploads";
+import { useCurrentOrganization } from "@/hooks/use-current-organization";
+import { useCurrentCollection } from "@/hooks/use-current-collection";
 
 export function OrganizationDashboard() {
-  const { slug } = useParams<{ slug: string }>()
+  const { slug } = useCurrentOrganization()
 
   const { data, isLoading } = useGetCollections({ slug: slug! })
 
   const collections = data?.collections ?? []
 
-  const [selectedCollectionId, setSelectedCollectionId] = useState<string | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const { set: setCurrentCollectionId, get: getCurrentCollectionId } = useCurrentCollection()
 
   const { data: organizationUploads, isLoading: loadingOrganizationUploads } = useGetOrganizationUploads({
     slug: slug!,
-    collectionId: selectedCollectionId ? selectedCollectionId : undefined
+    collectionId: getCurrentCollectionId() ?? undefined
   })
 
   return (
@@ -56,8 +58,8 @@ export function OrganizationDashboard() {
         ) : collections.length > 0 ? (
           <CollectionTree
             items={collections}
-            selectedId={selectedCollectionId}
-            onSelect={setSelectedCollectionId}
+            selectedId={getCurrentCollectionId()}
+            onSelect={(collectionId) => setCurrentCollectionId(collectionId)}
           />
         ) : (
           <div className="w-full flex flex-col items-center justify-center py-10 text-zinc-600">

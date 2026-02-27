@@ -14,6 +14,7 @@ import { useCurrentOrganization } from "@/hooks/use-current-organization";
 import { Dialog, DialogTrigger } from "./ui/dialog";
 import { CreateOrganizationDialog } from "./create-organization-dialog";
 import { useState } from "react";
+import { Skeleton } from "./ui/skeleton";
 
 type Organization = {
   id: string
@@ -31,17 +32,29 @@ export function OrganizationSwitcher({ organizations }: OrganizationSwitcherProp
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const { organization: currentOrganization } = useCurrentOrganization(organizations)
+  const { organization: currentOrganization, isLoading: isLoadingOrganization } = useCurrentOrganization()
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <div
-          className="bg-zinc-800 border border-zinc-600 rounded-md px-4 py-2 flex items-center justify-between gap-3 min-w-42"
-        >
-          <span className="font-semibold text-sm text-zinc-100">{currentOrganization.name}</span>
-          <ChevronsUpDown className="size-4 text-zinc-500 stroke-2" />
-        </div>
+        {isLoadingOrganization ? (
+          <Skeleton className="w-42 h-9" />
+        ) :
+          currentOrganization ? (
+            <div
+              className="bg-zinc-800 border border-zinc-600 rounded-md px-4 py-2 flex items-center justify-between gap-3 min-w-42"
+            >
+              <span className="font-semibold text-sm text-zinc-100">{currentOrganization.name}</span>
+              <ChevronsUpDown className="size-4 text-zinc-500 stroke-2" />
+            </div>
+          ) : (
+            <div
+              className="bg-zinc-800 border border-zinc-600 rounded-md px-4 py-2 flex items-center justify-between gap-3 min-w-42"
+            >
+              <span className="font-semibold text-sm text-zinc-100">Selecione</span>
+              <ChevronsUpDown className="size-4 text-zinc-500 stroke-2" />
+            </div>
+          )}
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"

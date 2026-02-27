@@ -4,7 +4,6 @@ import { Tabs, TabsList, TabsPanel, TabsTab } from "@/components/ui/tabs-underli
 import { Link } from "lucide-react";
 import { OrganizationMembers } from "./tabs/organization-members";
 import { PendingInvites } from "./tabs/pending-invites";
-import { useParams } from "react-router-dom";
 import { useGetPendingInvites } from "@/http/get-pending-invites";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGetMemberships } from "@/http/get-memberships";
@@ -14,10 +13,11 @@ import { handleCreateInvite } from "./actions";
 import { toast } from "sonner";
 import { useState } from "react";
 import { useGetMembership } from "@/http/get-membership";
+import { useCurrentOrganization } from "@/hooks/use-current-organization";
 
 export function MembersTab() {
 
-  const { slug } = useParams<{ slug: string }>()
+  const { slug } = useCurrentOrganization()
 
   const { data, isLoading } = useGetPendingInvites({ slug: slug! })
   const { data: memberships, isLoading: loadingMemberships } = useGetMemberships({ slug: slug! })

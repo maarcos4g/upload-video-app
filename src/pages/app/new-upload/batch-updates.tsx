@@ -4,7 +4,7 @@ import { env } from "@/env"
 import { useUploadStore } from "@/store/use-upload-store"
 import axios from "axios"
 import dayjs from "dayjs"
-import { Check, Copy, Video } from "lucide-react"
+import { Check, Copy, Loader2, Video } from "lucide-react"
 import { useLayoutEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import { toast } from "sonner"
@@ -12,6 +12,7 @@ import { toast } from "sonner"
 export function BatchUpdates() {
   const { slug, batchId } = useParams<{ slug: string, batchId: string }>()
   const [progress, setProgress] = useState<number[]>([])
+  const [loading, setLoading] = useState<boolean>(false)
 
   const { currentBatch } = useUploadStore()
 
@@ -27,6 +28,7 @@ export function BatchUpdates() {
   }, [batchId])
 
   async function handleSaveAll() {
+    setLoading(true)
     const promises = currentBatch.files.map(async (signedFile, index) => {
       const fileBinary = currentBatch.binaries[index].file
 
@@ -49,6 +51,7 @@ export function BatchUpdates() {
               })
             },
           })
+          .finally(() => setLoading(false))
       } catch (error) {
         console.error(`Falha no upload: ${signedFile.title}`, error)
         toast.error(`Falha no upload do arquivo: ${signedFile.title}`)
@@ -71,10 +74,19 @@ export function BatchUpdates() {
         <button
           onClick={handleSaveAll}
           className="bg-emerald-950 px-4 py-2 flex items-center gap-2 rounded text-sm font-semibold hover:bg-emerald-950/80 cursor-pointer disabled:bg-emerald-900/30 disabled:text-zinc-100/30"
-          disabled={files.length <= 0}
+          disabled={files.length <= 0 || loading}
         >
-          <Check className="size-4" />
-          Salvar lote
+          {!loading ? (
+            <>
+              <Check className="size-4" />
+              Salvar lote
+            </>
+          ) : (
+            <>
+              <Loader2 className='animate-spin size-4' />
+              <p>Salvando...</p>
+            </>
+          )}
         </button>
       </div>
 
@@ -83,7 +95,7 @@ export function BatchUpdates() {
           <TableHeader>
             <TableRow className="border-zinc-800 hover:bg-transparent">
               <TableHead className="text-zinc-400 font-normal text-sm"></TableHead>
-              <TableHead className="text-zinc-400 font-normal text-sm">Vídeo</TableHead>
+              <TableHead className="text-zinc-400 font-normal text-sm" colSpan={4}>Vídeo</TableHead>
               <TableHead className="text-zinc-400 font-normal text-sm">Duração</TableHead>
               <TableHead className="text-zinc-400 font-normal text-sm">Tamanho</TableHead>
               <TableHead className="text-zinc-400 font-normal text-sm">ID Externo</TableHead>
@@ -102,7 +114,7 @@ export function BatchUpdates() {
                   <TableCell className="flex px-4 py-2 items-center justify-center">
                     <span className="text-sm font-bold">{index + 1}</span>
                   </TableCell>
-                  <TableCell>
+                  <TableCell colSpan={4}>
                     <div
                       className="flex flex-col"
                     >

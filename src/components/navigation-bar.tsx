@@ -1,13 +1,9 @@
 import { Code2, FilePlus, ListVideo, Settings } from "lucide-react";
 import { NavLink } from "@/components/nav-link";
-import { useGetOrganizations } from "@/http/get-organizations";
 import { useCurrentOrganization } from "@/hooks/use-current-organization";
 
 export function NavigationBar() {
-
-  const { data } = useGetOrganizations()
-
-  const { slug } = useCurrentOrganization(data?.organizations ?? [])
+  const { slug } = useCurrentOrganization()
 
   const baseURL = slug ? `/org/${slug}` : ''
 
