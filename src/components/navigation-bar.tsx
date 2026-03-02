@@ -1,4 +1,4 @@
-import { Code2, FilePlus, ListVideo, Settings } from "lucide-react";
+import { FilePlus, ListVideo, Settings } from "lucide-react";
 import { NavLink } from "@/components/nav-link";
 import { useCurrentOrganization } from "@/hooks/use-current-organization";
 
@@ -26,10 +26,10 @@ export function NavigationBar() {
         Configurações
       </NavLink>
 
-      <NavLink to={`${baseURL}/developers`}>
+      {/* <NavLink to={`${baseURL}/developers`}>
         <Code2 className="size-4" />
         Desenvolvedor
-      </NavLink>
+      </NavLink> */}
     </nav>
   )
 }
