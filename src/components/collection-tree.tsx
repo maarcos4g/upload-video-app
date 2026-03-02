@@ -4,12 +4,7 @@ import { ChevronRight, Folder, FolderOpen } from 'lucide-react'
 import { cn } from "@/lib/utils"
 import { ContextMenu, ContextMenuTrigger } from './ui/context-menu'
 import { CollectionMenuContent } from './collection-menu-content'
-
-interface Collection {
-  id: string
-  name: string
-  children?: Collection[]
-}
+import type { Collection } from '@/http/get-collections/types'
 
 interface CollectionTreeProps {
   items: Collection[]

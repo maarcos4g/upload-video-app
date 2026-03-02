@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/table"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 import { UploadStatus } from "../upload-status"
-import { MoreHorizontal, Trash } from "lucide-react"
+import { Trash } from "lucide-react"
 
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
