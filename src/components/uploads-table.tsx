@@ -5,8 +5,8 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table"
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
-import { UploadStatus } from "../upload-status"
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
+import { UploadStatus } from "./upload-status"
 import { Trash } from "lucide-react"
 
 import dayjs from 'dayjs'
@@ -14,6 +14,8 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import 'dayjs/locale/pt-br'
 import type { GetUploadResponse } from "@/http/get-uploads/types"
 import { Link } from "react-router-dom"
+import { Dialog, DialogTrigger } from "./ui/dialog"
+import { DeleteUploadDialog } from "./delete-upload-dialog"
 
 dayjs.extend(relativeTime)
 dayjs.locale('pt-br')
@@ -90,9 +92,12 @@ export function UploadsTable({ uploads, slug }: UploadsTableProps) {
               </TableCell>
 
               <TableCell>
-                <button className="p-2 cursor-pointer hover:bg-zinc-800 rounded-md transition-colors text-zinc-500 hover:text-zinc-100">
-                  <Trash className="size-4 text-red-600" />
-                </button>
+                <Dialog>
+                  <DialogTrigger className="p-2 cursor-pointer hover:bg-zinc-800 rounded-md transition-colors text-zinc-500 hover:text-zinc-100">
+                    <Trash className="size-4 text-red-600" />
+                  </DialogTrigger>
+                  <DeleteUploadDialog upload={upload} />
+                </Dialog>
               </TableCell>
             </TableRow>
           ))}

@@ -1,15 +1,21 @@
 import { Input } from "@/components/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { GetUploadResponse } from "@/http/get-upload/types";
+import { useRequestGenerateMetadata } from "@/http/request-generate-metadata";
 import { parseTranscription, type ParseTranscription } from "@/utils/parse-transcription";
-import { ClipboardCopy, Loader2 } from "lucide-react";
+import { ClipboardCopy, Loader2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
+import { useCurrentOrganization } from "@/hooks/use-current-organization";
+import { useUpdateUpload } from "@/http/update-upload";
+import { useFormState } from "@/hooks/use-form-state";
+import { handleUpdateUpload } from "./actions";
 
 type OvervireTabProps = GetUploadResponse & {
   generatingMetadata?: boolean
 }
 
 export function OverviewTab({ upload, generatingMetadata }: OvervireTabProps) {
+  const { slug } = useCurrentOrganization()
 
   function handleCopyExternalID(externalId: string) {
     navigator.clipboard.writeText(externalId)
@@ -18,16 +24,50 @@ export function OverviewTab({ upload, generatingMetadata }: OvervireTabProps) {
 
   const transcription: ParseTranscription[] | null = upload.transcription ? parseTranscription(upload.transcription) : null
 
+  const { mutateAsync: generateMetadata, isPending } = useRequestGenerateMetadata()
+  const { mutateAsync: updateUpload } = useUpdateUpload()
+
+  const [{ errors }, handleSubmit, isPendingUpdate] = useFormState(
+    (data) => handleUpdateUpload(data, updateUpload)
+  )
+
+  async function handleGenerateMetadata() {
+    try {
+      await generateMetadata({ slug: slug!, uploadId: upload.id, title: true, description: true })
+      toast.success('Gerando título e descrição com IA...')
+    } catch (error) {
+      toast.error('Erro ao gerar título e descrição.')
+    }
+  }
+
   return (
     <div className="grid grid-cols-[1fr_488px] space-x-4">
       <div className="border border-zinc-800 px-6 py-4 rounded-md space-y-4">
-        <div>
-          <h2 className="text-lg font-bold">Editar vídeo</h2>
-          <p className="text-sm font-normal text-zinc-500">Atualize as informações do vídeo</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-bold">Editar vídeo</h2>
+            <p className="text-sm font-normal text-zinc-500">Atualize as informações do vídeo</p>
+          </div>
+
+          <button
+            type="button"
+            className='bg-transparent border border-zinc-800 px-4 py-2 rounded cursor-pointer text-xs font-medium text-zinc-300 flex items-center justify-center gap-1.5 hover:bg-zinc-900 disabled:text-zinc-500 disabled:hover:bg-transparent disabled:cursor-not-allowed'
+            disabled={isPending || generatingMetadata}
+            onClick={handleGenerateMetadata}
+          >
+            {isPending || generatingMetadata ? (
+              <Loader2 className="animate-spin size-4" />
+            ) : (
+              <>
+                <Sparkles className='size-4' />
+                Gerar informações com IA
+              </>
+            )}
+          </button>
         </div>
 
 
-        <form className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div className="flex flex-col gap-2">
             <label
               htmlFor="title"
@@ -44,14 +84,11 @@ export function OverviewTab({ upload, generatingMetadata }: OvervireTabProps) {
               defaultValue={upload.title}
             />
 
-            {/* <button
-              // onClick={generateTitlesWithAI}
-              className='bg-transparent border border-zinc-800 px-4 py-2 rounded cursor-pointer text-xs font-medium text-zinc-300 flex items-center justify-center gap-1.5 hover:bg-zinc-900 disabled:text-zinc-500 disabled:hover:bg-transparent disabled:cursor-not-allowed'
-            // disabled={files.length <= 0}
-            >
-              <Sparkles className='size-4' />
-              Gerar título curto com IA
-            </button> */}
+            {errors?.title && (
+              <p className="text-xs font-medium text-red-500 dark:text-red-400">
+                {errors.title[0]}
+              </p>
+            )}
           </div>
 
           <div className="flex flex-col gap-2">
@@ -81,14 +118,11 @@ export function OverviewTab({ upload, generatingMetadata }: OvervireTabProps) {
               </div>
             )}
 
-            {/* <button
-              // onClick={generateTitlesWithAI}
-              className='bg-transparent border border-zinc-800 px-4 py-2 rounded cursor-pointer text-xs font-medium text-zinc-300 flex items-center justify-center gap-1.5 hover:bg-zinc-900 disabled:text-zinc-500 disabled:hover:bg-transparent disabled:cursor-not-allowed'
-            // disabled={files.length <= 0}
-            >
-              <Sparkles className='size-4' />
-              Gerar descrição com IA
-            </button> */}
+            {errors?.description && (
+              <p className="text-xs font-medium text-red-500 dark:text-red-400">
+                {errors.description[0]}
+              </p>
+            )}
           </div>
 
           <div className="flex flex-col gap-2">
@@ -116,11 +150,23 @@ export function OverviewTab({ upload, generatingMetadata }: OvervireTabProps) {
             </div>
           </div>
 
+          <input type="text" hidden id="uploadId" name="uploadId" value={upload.id} />
+          <input type="text" hidden id="slug" name="slug" value={slug} />
+
           <button
             type="submit"
-            className="bg-zinc-100 px-10 py-2 rounded text-sm text-zinc-900 font-semibold"
+            className="bg-zinc-100 px-10 py-2 rounded text-sm text-zinc-900 font-semibold cursor-pointer disabled:opacity-50"
+            disabled={isPendingUpdate || generatingMetadata}
           >
-            Salvar
+            {
+              isPendingUpdate ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <>
+                  Salvar
+                </>
+              )
+            }
           </button>
         </form>
       </div>
@@ -132,9 +178,8 @@ export function OverviewTab({ upload, generatingMetadata }: OvervireTabProps) {
           <div className="w-full relative aspect-video">
             <iframe
               src={upload.streamURL}
-              loading="lazy"
               allowFullScreen
-              className="absolute top-0 left-0 w-full h-full border-none"
+              className="absolute top-0 left-0 w-full h-full border-none rounded-t-md"
             />
             {/* <source src={`https://vz-3b85ab2e-d35.b-cdn.net/f182abda-6dbb-46a6-8f02-38cbfaf0bd99/playlist.m3u8`} /> */}
           </div>
@@ -150,7 +195,7 @@ export function OverviewTab({ upload, generatingMetadata }: OvervireTabProps) {
         )}
 
         {upload.transcription ? (
-          <div className="px-4 py-4 flex-1 max-h-67.5 space-y-1 overflow-y-auto overflow-hidden no-scrollbar text-sm text-zinc-200 leading-relaxed">
+          <div className="px-4 py-4 flex-1 max-h-60 space-y-1 overflow-y-auto overflow-hidden no-scrollbar text-sm text-zinc-200 leading-relaxed">
             {transcription?.map((item, index) => (
               <div key={index} className="flex items-start gap-2">
 
@@ -177,6 +222,6 @@ export function OverviewTab({ upload, generatingMetadata }: OvervireTabProps) {
           </div>
         )}
       </div>
-    </div>
+    </div >
   )
 }
