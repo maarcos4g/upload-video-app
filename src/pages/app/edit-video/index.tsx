@@ -3,7 +3,7 @@ import { useGetUpload } from "@/http/get-upload";
 import { useGetUploadActions } from "@/http/get-upload-actions";
 import { Music2, Youtube } from "lucide-react";
 import { useParams } from "react-router-dom";
-import { ActionsTab } from "./tabs/actions";
+import { ActionsTab } from "./tabs/actions.tsx";
 import { OverviewTab } from "./tabs/overview";
 import { Skeleton } from "@/components/ui/skeleton";
 

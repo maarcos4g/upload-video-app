@@ -9,6 +9,7 @@ import { NewUpload } from "./pages/app/new-upload";
 import { BatchUpdates } from "./pages/app/new-upload/batch-updates";
 import { OrganizationSettings } from "./pages/app/organization-settings";
 import { EditVideo } from "./pages/app/edit-video";
+import { AccountSettings } from "./pages/app/account-settings";
 
 export const router = createBrowserRouter([
   {
@@ -38,6 +39,10 @@ export const router = createBrowserRouter([
       {
         path: '/org/:slug/video/:videoId',
         element: <EditVideo />
+      },
+      {
+        path: '/account/settings',
+        element: <AccountSettings />
       },
     ]
   },

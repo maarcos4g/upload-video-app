@@ -1,4 +1,4 @@
-import { Check, ChevronDown, Loader2, LogOut, User2, UserRoundPlus, X } from 'lucide-react'
+import { Check, ChevronDown, Loader2, LogOut, UserRoundCog, UserRoundPlus, X } from 'lucide-react'
 
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import {
@@ -18,6 +18,7 @@ import dayjs from 'dayjs'
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from './ui/sheet'
 import { useAcceptInvitation } from '@/http/accept-invitation.ts'
 import { useRevokeInvitation } from '@/http/revoke-invitation'
+import { Link } from 'react-router-dom'
 
 function getInitials(name: string): string {
   const initials = name
@@ -72,10 +73,10 @@ export function ProfileButton() {
 
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
-            <button className='w-full '>
-              <User2 className='size-4' />
-              <span>Editar Perfil</span>
-            </button>
+            <Link to={'/account/settings'} className='w-full '>
+              <UserRoundCog className='size-4' />
+              <span>Configurações da conta</span>
+            </Link>
           </DropdownMenuItem>
           <Sheet>
             <SheetTrigger asChild>

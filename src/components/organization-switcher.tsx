@@ -9,7 +9,7 @@ import {
   DropdownMenu
 } from "./ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useCurrentOrganization } from "@/hooks/use-current-organization";
 import { Dialog, DialogTrigger } from "./ui/dialog";
 import { CreateOrganizationDialog } from "./create-organization-dialog";
@@ -33,6 +33,26 @@ export function OrganizationSwitcher({ organizations }: OrganizationSwitcherProp
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const { organization: currentOrganization, isLoading: isLoadingOrganization } = useCurrentOrganization()
+
+  const { pathname } = useLocation()
+
+  function getSwitchURL(newSlug: string) {
+    if (pathname.startsWith('/org/')) {
+      const pathParts = pathname.split('/')
+      const currentSubRoute = pathParts[3]
+
+
+      const safeRoutesToPreserve = ['settings', 'upload', 'developers']
+
+      if (currentSubRoute && safeRoutesToPreserve.includes(currentSubRoute)) {
+        pathParts[2] = newSlug
+        return pathParts.join('/')
+      }
+      return `/org/${newSlug}`
+    }
+
+    return `/org/${newSlug}`
+  }
 
   return (
     <DropdownMenu>
@@ -69,7 +89,7 @@ export function OrganizationSwitcher({ organizations }: OrganizationSwitcherProp
           {organizations.map((organization) => {
             return (
               <DropdownMenuItem key={organization.id} asChild>
-                <Link to={`/org/${organization.slug}`} className="justify-between hover:bg-zinc-700/50">
+                <Link to={getSwitchURL(organization.slug)} className="justify-between hover:bg-zinc-700/50">
                   <div className="flex items-center gap-4">
                     <Avatar className="size-4">
                       {organization.avatarURL && (

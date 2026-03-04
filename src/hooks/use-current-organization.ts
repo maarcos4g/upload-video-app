@@ -1,4 +1,5 @@
 import { useGetOrganizations } from '@/http/get-organizations'
+import { useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 
 export function useCurrentOrganization() {
@@ -6,11 +7,19 @@ export function useCurrentOrganization() {
 
   const { data, isLoading } = useGetOrganizations()
 
-  const currentOrganization = data?.organizations.find(org => org.slug === slug)
+  useEffect(() => {
+    if (slug) {
+      localStorage.setItem('@upload.video:last-org-slug', slug)
+    }
+  }, [slug])
+
+  const activeSlug = slug ?? localStorage.getItem('@upload.video:last-org-slug')
+
+  const currentOrganization = data?.organizations.find(org => org.slug === activeSlug)
 
   return {
     organization: currentOrganization,
-    slug,
+    slug: activeSlug,
     isLoading,
   }
 }
