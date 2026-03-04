@@ -74,7 +74,7 @@ export function UpdateCollectionSheet({ collection: currentCollection }: UpdateC
           </label>
 
           <input type="hidden" name="parentId" value={selectedParentId} />
-          <input type="hidden" name="slug" value={slug} />
+          <input type="hidden" name="slug" value={slug ?? ''} />
           <input type="hidden" name="collectionId" value={currentCollection.id} />
 
           {errors?.parentId && (

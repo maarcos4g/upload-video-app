@@ -45,7 +45,7 @@ export function GeneralTab() {
     try {
       await uploadAvatar({
         file,
-        organizationSlug: slug
+        organizationSlug: slug ?? ''
       })
     } catch (error) {
       setAvatarPreview(null)
@@ -113,7 +113,7 @@ export function GeneralTab() {
               className="ring-offset-emerald-950 focus-visible:ring-emerald-950 text-sm"
             />
 
-            <input type="text" id="slug" name="slug" value={slug} className="hidden" />
+            <input type="text" id="slug" name="slug" value={slug ?? ''} className="hidden" />
 
             {errors?.name && (
               <p className="text-[10px] font-medium text-red-500 dark:text-red-400">
@@ -152,7 +152,7 @@ export function GeneralTab() {
               className="ring-offset-emerald-950 focus-visible:ring-emerald-950 text-sm"
             />
 
-            <input type="text" id="slug" name="slug" value={slug} className="hidden" />
+            <input type="text" id="slug" name="slug" value={slug!} className="hidden" />
 
             {errors?.domain && (
               <p className="text-[10px] font-medium text-red-500 dark:text-red-400">

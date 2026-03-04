@@ -59,7 +59,7 @@ export function DeleteCollectionDialog({ collection }: DeleteCollectionDialogPro
           />
         </div>
 
-        <input type="text" id="slug" name="slug" className="hidden" value={slug} />
+        <input type="text" id="slug" name="slug" className="hidden" value={slug ?? ''} />
         <input type="text" id="collectionId" name="collectionId" className="hidden" value={collection.id} />
 
         <div

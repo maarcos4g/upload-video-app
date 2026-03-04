@@ -151,7 +151,7 @@ export function OverviewTab({ upload, generatingMetadata }: OvervireTabProps) {
           </div>
 
           <input type="text" hidden id="uploadId" name="uploadId" value={upload.id} />
-          <input type="text" hidden id="slug" name="slug" value={slug} />
+          <input type="text" hidden id="slug" name="slug" value={slug ?? ''} />
 
           <button
             type="submit"

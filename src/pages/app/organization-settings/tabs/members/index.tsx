@@ -47,7 +47,7 @@ export function MembersTab() {
           <h1 className="font-semibold text-zinc-50">Convidar membros</h1>
           <p className="text-sm text-zinc-500">Convide novo membros através do endereço de e-mail</p>
           <form onSubmit={handleSubmit}>
-            <input type="hidden" name="slug" value={slug} />
+            <input type="hidden" name="slug" value={slug ?? ''} />
             <input type="hidden" name="email" value={''} />
             <input type="hidden" name="role" value={''} />
 
@@ -80,7 +80,7 @@ export function MembersTab() {
               />
             </div>
 
-            <input type="hidden" name="slug" value={slug} />
+            <input type="hidden" name="slug" value={slug ?? ''} />
 
             <input type="hidden" name="role" value={role} />
 

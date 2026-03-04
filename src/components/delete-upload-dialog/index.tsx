@@ -58,7 +58,7 @@ export function DeleteUploadDialog({ upload }: DeleteUploadDialogProps) {
           />
         </div>
 
-        <input type="text" id="slug" name="slug" className="hidden" value={slug} />
+        <input type="text" id="slug" name="slug" className="hidden" value={slug ?? ''} />
         <input type="text" id="uploadId" name="uploadId" className="hidden" value={upload.id} />
 
         <div

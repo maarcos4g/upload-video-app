@@ -110,7 +110,7 @@ export function CreateCollectionDialog({ collections, onClose }: CreateOrganizat
             </label>
           </div>
 
-          <input type="hidden" name="organizationSlug" value={slug} />
+          <input type="hidden" name="organizationSlug" value={slug ?? ''} />
 
           {hasParent && (
             <div
