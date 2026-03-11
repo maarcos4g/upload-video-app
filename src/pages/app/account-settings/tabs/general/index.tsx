@@ -9,6 +9,7 @@ import dayjs from "dayjs";
 import { Image, Loader2 } from "lucide-react";
 import { useState, type ChangeEvent } from "react";
 import { handleUpdateProfile } from "./actions";
+import { useDeleteAccount } from "@/http/delete-account";
 
 export function GeneralTab() {
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
@@ -44,6 +45,7 @@ export function GeneralTab() {
   }
 
   const { mutateAsync: updateProfile } = useUpdateProfile()
+  const { mutateAsync: deleteAccount, isPending: pendingDeleteAccount } = useDeleteAccount()
 
   const [{ errors }, handleSubmit, isPending] = useFormState(
     (data) => handleUpdateProfile(data, updateProfile),
@@ -140,10 +142,20 @@ export function GeneralTab() {
       <div className="space-y-6">
         <div className="text-lg font-semibold border-b border-zinc-800 pb-2">Zona de perigo</div>
 
-        <button disabled className="bg-transparent border border-red-500/50 px-4 py-2 rounded text-sm font-semibold cursor-pointer hover:bg-red-500/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-          Deletar conta
+        <button
+          disabled={pendingDeleteAccount}
+          onClick={() => deleteAccount()}
+          className="bg-transparent border border-red-500/50 px-4 py-2 rounded text-sm font-semibold cursor-pointer hover:bg-red-500/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isPending ? (
+            <Loader2 className="size-4 animate-spin" />
+          ) : (
+            <>
+              Deletar conta
+            </>
+          )}
         </button>
       </div>
-    </div>
+    </div >
   )
 }

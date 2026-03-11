@@ -16,6 +16,7 @@ import { useUpdateOrganization } from "@/http/update-organization";
 import { useFormState } from "@/hooks/use-form-state";
 import { handleUpdateOrganization } from "./actions";
 import { useCurrentOrganization } from "@/hooks/use-current-organization";
+import { TransferOrganizationDialog } from "@/components/transfer-organization-dialog";
 
 export function GeneralTab() {
   const { slug } = useCurrentOrganization()
@@ -227,20 +228,28 @@ export function GeneralTab() {
       </div>
 
       {/* Transfer Organization */}
-      <div className="w-full flex items-center justify-between py-4 border-b border-zinc-800">
+      <div
+        data-admin={isAdmin}
+        className="w-full flex items-center justify-between py-4 border-b border-zinc-800 group"
+      >
         <div className="flex flex-col gap-2">
-          <span className="text-zinc-200 font-semibold">
+          <span className="text-zinc-200 font-semibold group-data-[admin=false]:text-zinc-700">
             Transferir Organização
           </span>
 
-          <p className="text-xs text-zinc-500 font-normal">
+          <p className="text-xs text-zinc-500 font-normal group-data-[admin=false]:text-zinc-700">
             Transfira todos os dados da organização para outro usuário.
           </p>
         </div>
 
-        <button className="bg-zinc-50 px-3 py-2 rounded text-sm text-zinc-900 hover:bg-zinc-200 cursor-pointer transition-all">
-          Transferir
-        </button>
+        <Dialog>
+          <DialogTrigger asChild>
+            <button disabled={!isAdmin} className="bg-zinc-50 px-3 py-2 rounded text-sm text-zinc-900 hover:bg-zinc-200 cursor-pointer transition-all disabled:bg-zinc-800 disabled:text-zinc-500 disabled:cursor-not-allowed disabled:hover:bg-zinc-800">
+              Transferir
+            </button>
+          </DialogTrigger>
+          <TransferOrganizationDialog />
+        </Dialog>
       </div>
 
       {/* Delete Organization */}
