@@ -1,7 +1,6 @@
 import { CollectionTree } from "@/components/collection-tree";
 import { Folder, Plus } from "lucide-react";
 import { useState } from "react";
-import { Progress } from "@/components/ui/progress";
 import { UploadsTable } from "@/components/uploads-table";
 import { useGetCollections } from "@/http/get-collections";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -85,23 +84,6 @@ export function OrganizationDashboard() {
           className="flex items-center justify-between"
         >
           <h1 className="text-xl font-bold text-zinc-50">Uploads</h1>
-
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-zinc-500">
-                Armazenamento
-              </span>
-
-              <span
-                className="text-xs font-medium text-zinc-200"
-              >
-                4.5GB
-                <span className="text-zinc-500">/10GB</span>
-              </span>
-            </div>
-
-            <Progress className="w-74" value={45} />
-          </div>
         </div>
 
         {loadingOrganizationUploads ? (

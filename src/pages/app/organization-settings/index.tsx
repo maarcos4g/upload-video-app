@@ -1,7 +1,8 @@
-import { Settings2, UsersRound, type LucideIcon } from "lucide-react"
+import { ChartNoAxesCombined, Settings2, UsersRound, type LucideIcon } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { GeneralTab } from "./tabs/general"
 import { MembersTab } from "./tabs/members"
+import { UsageTab } from "./tabs/usage"
 
 interface SideBarOptions {
   option: string
@@ -21,7 +22,12 @@ export function OrganizationSettings() {
       value: 'members',
       option: 'Membros',
       icon: UsersRound
-    }
+    },
+    {
+      value: 'usage',
+      option: 'Uso e Armazenamento',
+      icon: ChartNoAxesCombined
+    },
   ]
 
   return (
@@ -51,6 +57,10 @@ export function OrganizationSettings() {
           
           <TabsContent value="members">
             <MembersTab />
+          </TabsContent>
+          
+          <TabsContent value="usage">
+            <UsageTab />
           </TabsContent>
 
         </div>
