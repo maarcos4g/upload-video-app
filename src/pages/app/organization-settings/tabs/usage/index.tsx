@@ -1,7 +1,7 @@
 import { Skeleton } from "@/components/ui/skeleton"
 import { useCurrentOrganization } from "@/hooks/use-current-organization"
 import { useGetOrganizationUsage } from "@/http/get-usage"
-import { HardDrive, ArrowUpRight } from "lucide-react"
+import { HardDrive } from "lucide-react"
 
 // Função utilitária para converter Bytes em GB/MB bonitos
 function formatBytes(bytes: number, decimals = 2) {
@@ -49,13 +49,6 @@ export function UsageTab() {
                 </span>
               </div>
             </div>
-
-            <button
-              disabled
-              className="flex items-center gap-2 px-4 py-2 bg-zinc-100 text-zinc-900 font-semibold text-sm rounded-md hover:bg-zinc-200 transition-colors cursor-not-allowed disabled:opacity-50"
-            >
-              Fazer Upgrade <ArrowUpRight className="size-4" />
-            </button>
           </div>
 
           <div className="bg-zinc-950 px-6 py-4 border-t border-zinc-800 flex flex-col gap-2">

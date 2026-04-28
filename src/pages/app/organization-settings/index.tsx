@@ -1,8 +1,9 @@
-import { ChartNoAxesCombined, Settings2, UsersRound, type LucideIcon } from "lucide-react"
+import { ChartNoAxesCombined, DollarSign, Settings2, UsersRound, type LucideIcon } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { GeneralTab } from "./tabs/general"
 import { MembersTab } from "./tabs/members"
 import { UsageTab } from "./tabs/usage"
+import { BillingTab } from "./tabs/billing"
 
 interface SideBarOptions {
   option: string
@@ -27,6 +28,11 @@ export function OrganizationSettings() {
       value: 'usage',
       option: 'Uso e Armazenamento',
       icon: ChartNoAxesCombined
+    },
+    {
+      value: 'signature',
+      option: 'Assinaturas',
+      icon: DollarSign
     },
   ]
 
@@ -61,6 +67,10 @@ export function OrganizationSettings() {
           
           <TabsContent value="usage">
             <UsageTab />
+          </TabsContent>
+          
+          <TabsContent value="signature">
+            <BillingTab />
           </TabsContent>
 
         </div>

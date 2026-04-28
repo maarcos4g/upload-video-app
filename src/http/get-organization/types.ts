@@ -12,5 +12,6 @@ export type GetOrganizationResponse = {
     shouldAttachUsersByDomain: boolean
     createdAt: string
     ownerId: string
+    planId: string | null
   }
 }

@@ -12,6 +12,5 @@ export function useGetOrganizationUsage(data: GetUsageRequest) {
 
       return response.data
     },
-    enabled: !!data.slug
   })
 }

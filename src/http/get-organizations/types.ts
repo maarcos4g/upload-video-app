@@ -5,5 +5,6 @@ export type GetOrganizationsResponse = {
     avatarURL: string | null
     slug: string
     role: string
+    planId: string | null
   }[]
 }
